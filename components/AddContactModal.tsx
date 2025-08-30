@@ -1,14 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useCalendarStore } from "@/store/useCalendarStore";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+import { useStore } from "@/store/useStore"; // ✅ slice-based store
+import { toast } from "sonner"; // ✅ Sonner for notifications
 
 export default function AddContactModal() {
-  const { addContact } = useCalendarStore();
+  const addContact = useStore((s) => s.addContact);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -16,15 +30,24 @@ export default function AddContactModal() {
   const [timezone, setTimezone] = useState("");
 
   const handleSave = () => {
-    if (!name) return;
+    if (!name) {
+      toast.error("Name is required");
+      return;
+    }
 
-    addContact({
-      id: crypto.randomUUID(),
+    const success = addContact({
       name,
       email,
       phone,
       timezone,
     });
+
+    if (!success) {
+      toast.error("A contact with this email or phone already exists.");
+      return;
+    }
+
+    toast.success(`${name} has been added successfully.`);
 
     // reset form
     setName("");
@@ -36,9 +59,11 @@ export default function AddContactModal() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">+ Add Contact</Button>
+        <Button variant="outline" size="sm">
+          + Add Contact
+        </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Add New Contact</DialogTitle>
         </DialogHeader>
@@ -50,15 +75,34 @@ export default function AddContactModal() {
           </div>
           <div>
             <Label>Email</Label>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
           <div>
             <Label>Phone</Label>
-            <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <Input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </div>
           <div>
             <Label>Timezone</Label>
-            <Input value={timezone} onChange={(e) => setTimezone(e.target.value)} />
+            <Select value={timezone} onValueChange={setTimezone}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select timezone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="UTC">UTC</SelectItem>
+                <SelectItem value="America/New_York">America/New_York</SelectItem>
+                <SelectItem value="Europe/London">Europe/London</SelectItem>
+                <SelectItem value="Asia/Karachi">Asia/Karachi</SelectItem>
+                <SelectItem value="Asia/Dubai">Asia/Dubai</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
