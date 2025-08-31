@@ -8,26 +8,41 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useCalendarStore } from "@/store/useCalendarStore";
+import { useStore } from "@/store/useStore";
+import { toast } from "sonner";
 import AddContactModal from "./AddContactModal";
 
 export default function BookAppointmentModal() {
-    const { addAppointment, contacts } = useCalendarStore();
+    const { addAppointment, contacts } = useStore();
+    const [open, setOpen] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
     const [status, setStatus] = useState("confirmed");
     const [contactId, setContactId] = useState("");
+    const [internalNotes, setInternalNotes] = useState("");
+
+    const resetForm = () => {
+        setTitle("");
+        setDescription("");
+        setDate("");
+        setTime("");
+        setContactId("");
+        setStatus("confirmed");
+        setInternalNotes("");
+    };
 
     const handleSave = () => {
-        if (!title || !date || !time) return;
+        if (!title || !date || !time) {
+            toast.error("Please fill in title, date, and time");
+            return;
+        }
 
         const start = new Date(`${date}T${time}`);
         const end = new Date(start.getTime() + 30 * 60000); // 30min slot
 
-        addAppointment({
+        const appointment = {
             id: crypto.randomUUID(),
             title,
             description,
@@ -35,19 +50,22 @@ export default function BookAppointmentModal() {
             end,
             contactId,
             status: status as "confirmed" | "pending" | "cancelled",
-        });
+            internalNotes,
+        };
 
-        // reset
-        setTitle("");
-        setDescription("");
-        setDate("");
-        setTime("");
-        setContactId("");
-        setStatus("confirmed");
+        addAppointment(appointment);
+        toast.success("Appointment booked successfully!");
+        resetForm();
+        setOpen(false);
+    };
+
+    const handleCancel = () => {
+        resetForm();
+        setOpen(false);
     };
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button>+ Book Appointment</Button>
             </DialogTrigger>
@@ -103,7 +121,7 @@ export default function BookAppointmentModal() {
 
                             <div>
                                 <Label>Status</Label>
-                                <Select onValueChange={setStatus} defaultValue={status}>
+                                <Select onValueChange={setStatus} value={status}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select status" />
                                     </SelectTrigger>
@@ -126,35 +144,69 @@ export default function BookAppointmentModal() {
                                             <SelectValue placeholder="Select contact" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {contacts.map((c) => (
-                                                <SelectItem key={c.id} value={c.id}>
-                                                    {c.name} ({c.email || c.phone || "no info"})
+                                            {contacts.length > 0 ? (
+                                                contacts.map((c) => (
+                                                    <SelectItem key={c.id} value={c.id}>
+                                                        {c.name} ({c.email || c.phone || "no info"})
+                                                    </SelectItem>
+                                                ))
+                                            ) : (
+                                                <SelectItem value="add contact" disabled>
+                                                    No contacts available
                                                 </SelectItem>
-                                            ))}
+                                            )}
                                         </SelectContent>
                                     </Select>
                                     <AddContactModal />
                                 </div>
                             </div>
 
-
                             <div>
                                 <Label>Internal Notes</Label>
-                                <Textarea placeholder="Add internal note" />
+                                <Textarea 
+                                    placeholder="Add internal note" 
+                                    value={internalNotes}
+                                    onChange={(e) => setInternalNotes(e.target.value)}
+                                />
                             </div>
                         </div>
                     </TabsContent>
 
                     {/* Blocked Off Time Tab */}
                     <TabsContent value="blocked" className="mt-4">
-                        <p className="text-sm text-muted-foreground">
-                            Here you can block off time (to be implemented later).
-                        </p>
+                        <div className="space-y-4">
+                            <p className="text-sm text-muted-foreground">
+                                Block off time when you're unavailable for appointments.
+                            </p>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <Label>Start Date & Time</Label>
+                                    <div className="flex gap-2">
+                                        <Input type="date" placeholder="Start date" />
+                                        <Input type="time" placeholder="Start time" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label>End Date & Time</Label>
+                                    <div className="flex gap-2">
+                                        <Input type="date" placeholder="End date" />
+                                        <Input type="time" placeholder="End time" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <Label>Reason (Optional)</Label>
+                                <Input placeholder="e.g., Vacation, Meeting, etc." />
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                This feature will be fully implemented in a future update.
+                            </p>
+                        </div>
                     </TabsContent>
                 </Tabs>
 
                 <div className="flex justify-end gap-2 mt-6">
-                    <Button variant="outline">Cancel</Button>
+                    <Button variant="outline" onClick={handleCancel}>Cancel</Button>
                     <Button onClick={handleSave}>Book Appointment</Button>
                 </div>
             </DialogContent>

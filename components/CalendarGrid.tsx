@@ -88,12 +88,12 @@ export default function CalendarWithSidebar() {
                     className={cn(
                         "border p-2 h-32 relative transition-colors",
                         isOtherMonth && "bg-muted/30 text-muted-foreground",
-                        isCurrentDay && "bg-primary/10 border-primary/50 ring-2 ring-primary/20"
+                        isCurrentDay && "bg-primary/90 border-primary/50 ring-2 ring-primary/20"
                     )}
                 >
                     <div className={cn(
                         "text-xs font-semibold mb-1 inline-flex items-center justify-center size-6 rounded-full",
-                        isCurrentDay && "bg-primary text-primary-foreground"
+                        isCurrentDay && "bg-secondary text-secondary-foreground"
                     )}>
                         {format(day, "d")}
                     </div>
@@ -107,13 +107,13 @@ export default function CalendarWithSidebar() {
                                     className={cn(
                                         "p-1 text-xs truncate cursor-pointer transition-colors",
                                         isCurrentDay
-                                            ? "bg-primary/20 border-primary/30 hover:bg-primary/30"
+                                            ? "bg-secondary border-primary/30 hover:bg-gray-400/30 hover:font-white"
                                             : "bg-secondary/50 hover:bg-secondary/80"
                                     )}
                                 >
                                     <span className="font-medium">{appt.title}</span>
                                     {contact && (
-                                        <span className="block text-[10px] text-muted-foreground">
+                                        <span className="block text-[10px] ">
                                             {contact.name}
                                         </span>
                                     )}
