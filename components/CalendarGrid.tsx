@@ -136,9 +136,9 @@ export default function CalendarWithSidebar() {
     }
 
     return (
-        <div className="flex h-full bg-background">
+        <div className="flex flex-wrap h-full bg-background w-full">
             {/* Sidebar */}
-            <div className="w-80 border-r bg-muted/20 p-4 flex flex-col">
+            <div className="w-70 border-r bg-muted/20 p-4 flex flex-col">
                 {/* Header */}
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold text-primary mb-2">User</h1>
