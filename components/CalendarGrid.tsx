@@ -98,7 +98,8 @@ export default function CalendarWithSidebar() {
                     )}>
                         {format(day, "d")}
                     </div>
-
+                    
+                    {/* meetings in cards */}
                     <div className="space-y-1 mt-1">
                         {dayAppointments.map((appt) => {
                             const contact = contacts.find((c) => c.id === appt.contactId);
@@ -106,7 +107,7 @@ export default function CalendarWithSidebar() {
                                 <Card
                                     key={appt.id}
                                     className={cn(
-                                        "p-1 text-xs truncate cursor-pointer transition-colors",
+                                        "p-1 text-xs truncate cursor-pointer transition-colors rounded-none",
                                         isCurrentDay
                                             ? "bg-secondary border-primary/30 hover:bg-gray-400/30 hover:font-white"
                                             : "bg-secondary/50 hover:bg-secondary/80"
