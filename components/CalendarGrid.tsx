@@ -23,6 +23,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useStore } from "@/store/useStore";
 import { cn } from "@/lib/utils";
 import { Search, X, Calendar } from "lucide-react";
+import BookAppointmentModal from "./BookAppointmentModal";
 
 export default function CalendarWithSidebar() {
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -134,15 +135,16 @@ export default function CalendarWithSidebar() {
     }
 
     return (
-        <div className="flex h-screen bg-background">
+        <div className="flex h-full bg-background">
             {/* Sidebar */}
             <div className="w-80 border-r bg-muted/20 p-4 flex flex-col">
                 {/* Header */}
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-primary mb-2">Positify</h1>
-                    <p className="text-sm text-muted-foreground">
+                    <h1 className="text-2xl font-bold text-primary mb-2">User</h1>
+                    <p className="text-sm text-muted-foreground mb-5">
                         {format(currentMonth, "MMMM yyyy")}
                     </p>
+                    <BookAppointmentModal />
                 </div>
 
                 {/* Search */}
@@ -213,7 +215,7 @@ export default function CalendarWithSidebar() {
             </div>
 
             {/* Main Calendar */}
-            <div className="flex-1 p-6 overflow-auto">
+            <div className="flex-1 p-4 overflow-auto">
                 <div className="space-y-4">
                     {/* Calendar Header */}
                     <div className="flex justify-between items-center">
